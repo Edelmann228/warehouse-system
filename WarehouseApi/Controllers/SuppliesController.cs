@@ -10,33 +10,60 @@ namespace WarehouseApi.Controllers;
 public class SuppliesController : ControllerBase
 {
     private readonly AppDbContext _db;
+
     public SuppliesController(AppDbContext db) => _db = db;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await _db.Supplies
-            .Include(s => s.Items).ThenInclude(i => i.Product)
-            .ToListAsync());
+    public async Task<IActionResult> GetAll()
+    {
+        var supplies = await _db.Supplies
+            .Include(s => s.Items)
+            .ThenInclude(i => i.Product)
+            .ToListAsync();
+
+        var result = supplies.Select(s => new
+        {
+            s.Id,
+            s.SupplierName,
+            s.SupplyDate,
+            s.Status,
+            ItemsCount = s.Items.Count,
+            Items = s.Items.Select(i => new
+            {
+                i.ProductId,
+                ProductName = i.Product?.Name ?? "—",
+                i.Quantity,
+                i.UnitPrice
+            }).ToList()
+        });
+
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
         var s = await _db.Supplies
-            .Include(s => s.Items).ThenInclude(i => i.Product)
+            .Include(s => s.Items)
+            .ThenInclude(i => i.Product)
             .FirstOrDefaultAsync(s => s.Id == id);
+
         return s == null ? NotFound() : Ok(s);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Supply supply)
     {
-        // Принятая поставка увеличивает остатки на складе
         if (supply.Status == "Accepted")
+        {
             foreach (var item in supply.Items)
             {
                 var product = await _db.Products.FindAsync(item.ProductId);
-                if (product != null) product.StockQuantity += item.Quantity;
+                if (product != null)
+                    product.StockQuantity += item.Quantity;
             }
+        }
+
         _db.Supplies.Add(supply);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = supply.Id }, supply);
@@ -47,7 +74,9 @@ public class SuppliesController : ControllerBase
     {
         var s = await _db.Supplies.FindAsync(id);
         if (s == null) return NotFound();
-        s.SupplierName = upd.SupplierName; s.Status = upd.Status;
+
+        s.SupplierName = upd.SupplierName;
+        s.Status = upd.Status;
         await _db.SaveChangesAsync();
         return Ok(s);
     }
@@ -57,6 +86,7 @@ public class SuppliesController : ControllerBase
     {
         var s = await _db.Supplies.FindAsync(id);
         if (s == null) return NotFound();
+
         _db.Supplies.Remove(s);
         await _db.SaveChangesAsync();
         return NoContent();

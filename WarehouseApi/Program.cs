@@ -22,6 +22,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ── ДОБАВЛЕНО: Поддержка статических файлов для веб-интерфейса ────────
+builder.Services.AddSpaStaticFiles(configuration =>
+{
+    configuration.RootPath = "wwwroot";
+});
+
 var app = builder.Build();
 
 // ── 4. Применение миграций и заполнение тестовыми данными ─────────────
@@ -39,7 +45,19 @@ app.UseSwaggerUI();
 app.UseHttpMetrics();
 app.MapMetrics();
 
+app.UseStaticFiles();           // ← Добавлено
+app.UseSpaStaticFiles();        // ← Добавлено
+
 app.UseAuthorization();
 app.MapControllers();
 
+// ── ДОБАВЛЕНО: Маршрут для открытия веб-интерфейса ────────────────────
+app.MapGet("/warehouse", context =>
+{
+    context.Response.Redirect("/warehouse/index.html");
+    return Task.CompletedTask;
+});
+
 app.Run();
+
+

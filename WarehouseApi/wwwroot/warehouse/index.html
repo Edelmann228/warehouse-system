@@ -1,0 +1,981 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Склад</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #c0c0c0;
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        a {
+            color: blue;
+        }
+
+        /* AUTH */
+        #auth {
+            padding: 20px;
+        }
+
+            #auth h2 {
+                margin-bottom: 8px;
+            }
+
+            #auth p {
+                margin-bottom: 12px;
+            }
+
+        .auth-table td {
+            padding: 4px 8px 4px 0;
+        }
+
+        .auth-table input {
+            border: 2px inset #fff;
+            padding: 2px 4px;
+            width: 180px;
+        }
+
+        .hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #444;
+        }
+
+        /* APP */
+        #app {
+            display: none;
+        }
+
+        .titlebar {
+            background: #000080;
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .titlebar button {
+                background: #c0c0c0;
+                border: 2px outset #fff;
+                padding: 1px 8px;
+                font-size: 12px;
+                cursor: pointer;
+            }
+
+        .menubar {
+            background: #c0c0c0;
+            border-bottom: 1px solid #808080;
+            padding: 2px 4px;
+            display: flex;
+            gap: 2px;
+        }
+
+            .menubar button {
+                background: #c0c0c0;
+                border: 2px outset #fff;
+                padding: 2px 10px;
+                font-size: 13px;
+                cursor: pointer;
+            }
+
+                .menubar button:active, .menubar button.on {
+                    border: 2px inset #808080;
+                    background: #b0b0b0;
+                }
+
+        .main {
+            padding: 10px;
+        }
+
+        /* PANELS */
+        .panel {
+            background: #fff;
+            border: 2px inset #808080;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+            .panel h3 {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                border-bottom: 1px solid #808080;
+                padding-bottom: 4px;
+            }
+
+        /* TABLES */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        th {
+            background: #000080;
+            color: white;
+            padding: 3px 8px;
+            text-align: left;
+            border: 1px solid #004;
+        }
+
+        td {
+            padding: 3px 8px;
+            border: 1px solid #808080;
+            background: #fff;
+        }
+
+        tr:nth-child(even) td {
+            background: #f0f0f0;
+        }
+
+        tr.sel td {
+            background: #000080 !important;
+            color: white;
+        }
+
+        /* BUTTONS */
+        .btn {
+            background: #c0c0c0;
+            border: 2px outset #fff;
+            padding: 3px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+            .btn:active {
+                border: 2px inset #808080;
+            }
+
+        .btn-row {
+            margin: 6px 0;
+        }
+
+        /* FORM */
+        .form-row {
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .form-row label {
+                width: 130px;
+                text-align: right;
+                font-size: 13px;
+            }
+
+            .form-row input, .form-row select, .form-row textarea {
+                border: 2px inset #fff;
+                padding: 2px 4px;
+                font-size: 13px;
+                width: 200px;
+            }
+
+            .form-row textarea {
+                width: 200px;
+                height: 50px;
+                resize: none;
+            }
+
+        /* STATUS BAR */
+        .statusbar {
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            padding: 2px 8px;
+            font-size: 12px;
+            color: #000;
+        }
+
+        /* SHOP (user) */
+        .shop-layout {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .shop-left {
+            flex: 1;
+        }
+
+        .cart-box {
+            width: 260px;
+            background: #fff;
+            border: 2px inset #808080;
+            padding: 8px;
+        }
+
+            .cart-box h3 {
+                margin: 0 0 6px 0;
+                font-size: 13px;
+            }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+            padding: 3px 0;
+            font-size: 12px;
+        }
+
+        .cart-total {
+            font-weight: bold;
+            margin-top: 6px;
+            font-size: 13px;
+            text-align: right;
+        }
+
+        .qty-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+            .qty-ctrl button {
+                background: #c0c0c0;
+                border: 1px outset #fff;
+                width: 20px;
+                height: 20px;
+                font-size: 13px;
+                cursor: pointer;
+                padding: 0;
+                line-height: 1;
+            }
+
+            .qty-ctrl span {
+                width: 24px;
+                text-align: center;
+                font-size: 13px;
+                font-weight: bold;
+            }
+
+        /* SUPPLIES FORM */
+        .supply-layout {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .supply-left {
+            flex: 1;
+        }
+
+        .supply-right {
+            width: 260px;
+            background: #fff;
+            border: 2px inset #808080;
+            padding: 8px;
+        }
+
+            .supply-right h3 {
+                margin: 0 0 6px 0;
+                font-size: 13px;
+            }
+
+        .supply-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+            padding: 3px 0;
+            font-size: 12px;
+        }
+
+        /* SEARCH */
+        .searchbar {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+            .searchbar input {
+                border: 2px inset #fff;
+                padding: 2px 4px;
+                width: 180px;
+                font-size: 13px;
+            }
+
+        /* MODAL */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+            .overlay.show {
+                display: flex;
+            }
+
+        .dialog {
+            background: #c0c0c0;
+            border: 2px outset #fff;
+            min-width: 320px;
+        }
+
+        .dialog-title {
+            background: #000080;
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .dialog-title button {
+                background: #c0c0c0;
+                border: 1px outset #fff;
+                width: 18px;
+                height: 18px;
+                font-size: 11px;
+                cursor: pointer;
+                line-height: 1;
+                padding: 0;
+            }
+
+        .dialog-body {
+            padding: 12px;
+        }
+
+        .dialog-footer {
+            padding: 6px 12px;
+            text-align: right;
+            border-top: 1px solid #808080;
+        }
+
+        /* STATUS */
+        .ok {
+            color: green;
+            font-weight: bold;
+        }
+
+        .err {
+            color: red;
+            font-weight: bold;
+        }
+
+        input[type=search]::-webkit-search-cancel-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUTH -->
+    <div id="auth">
+        <h2> Система управления складом</h2>
+        <p>Для входа введите логин и пароль:</p>
+        <table class="auth-table">
+            <tr><td>Логин:</td><td><input id="li" autocomplete="off" onkeydown="if(event.key==='Enter')login()"></td></tr>
+            <tr><td>Пароль:</td><td><input id="pi" type="password" onkeydown="if(event.key==='Enter')login()"></td></tr>
+            <tr><td></td><td><button class="btn" onclick="login()">Войти</button></td></tr>
+        </table>
+        <p class="hint">admin / admin123 — полный доступ &nbsp;|&nbsp; user / user123 — просмотр и покупка</p>
+    </div>
+
+    <!-- APP -->
+    <div id="app">
+        <div class="titlebar">
+            <span id="app-title">Склад</span>
+            <button onclick="logout()">Выйти</button>
+        </div>
+        <div class="menubar" id="menubar"></div>
+        <div class="main" id="main"></div>
+        <div class="statusbar" id="statusbar">Готово.</div>
+        <audio src="babymonster-hot-sauce.mp3" controls></audio>
+        <div class="menubar" id="menubar"></div>
+        
+    </div>
+
+    <!-- MODAL -->
+    <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+        <div class="dialog">
+            <div class="dialog-title">
+                <span id="dlg-title">Диалог</span>
+                <button onclick="closeModal()">✕</button>
+            </div>
+            <div class="dialog-body" id="dlg-body"></div>
+            <div class="dialog-footer">
+                <button class="btn" onclick="closeModal()">Отмена</button>
+                <button class="btn" id="dlg-ok" onclick="saveModal()">ОК</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        // CONFIG
+        const BASE = '/api';
+        let me = null, curPage = '', editId = null;
+        let shopData = [], cart = [], quantities = {}, shopQ = '';
+        let supplyData = [], supplyList = [], supplyQ = '', supplyInfo = { supplier: '', date: '' };
+        let writeoffData = [], writeoffList = [], writeoffQ = '', writeoffReason = '';
+
+        const USERS = {
+            admin: { pass: 'admin123', role: 'admin' },
+            user: { pass: 'user123', role: 'user' }
+        };
+        // AUTH
+       
+        function login() {
+            const u = $('li').value.trim().toLowerCase();
+            const p = $('pi').value;
+            if (USERS[u] && USERS[u].pass === p) {
+                me = { login: u, role: USERS[u].role };
+                $('auth').style.display = 'none';
+                $('app').style.display = 'block';
+                $('app-title').textContent = '📦 Склад — ' + (me.role === 'admin' ? 'Администратор' : 'Пользователь');
+                buildMenu();
+                goPage(me.role === 'admin' ? 'products' : 'shop');
+            } else {
+                alert('Неверный логин или пароль');
+            }
+        }
+
+        function logout() {
+            me = null; cart = []; quantities = {}; supplyList = []; writeoffList = [];
+            $('app').style.display = 'none';
+            $('auth').style.display = 'block';
+            $('li').value = ''; $('pi').value = '';
+        }
+
+      
+        // MENU
+      
+        function buildMenu() {
+            const pages = me.role === 'admin'
+                ? [{ k: 'products', l: 'Товары' }, { k: 'supplies', l: 'Поставки' }, { k: 'writeoffs', l: 'Списания' }]
+                : [{ k: 'shop', l: 'Товары / Покупка' }];
+            $('menubar').innerHTML = pages.map(p =>
+                `<button id="mb-${p.k}" onclick="goPage('${p.k}')">${p.l}</button>`
+            ).join('');
+        }
+
+        function setActive(k) {
+            document.querySelectorAll('.menubar button').forEach(b => b.classList.remove('on'));
+            const el = $('mb-' + k); if (el) el.classList.add('on');
+        }
+
+        function status(msg) { $('statusbar').textContent = msg; }
+
+       
+        // API
+       
+        async function api(method, url, body) {
+            const r = await fetch(BASE + url, {
+                method, headers: { 'Content-Type': 'application/json' },
+                body: body ? JSON.stringify(body) : null
+            });
+            if (!r.ok) {
+                const t = await r.text();
+                let m = t; try { const j = JSON.parse(t); m = j.title || j.message || t; } catch { }
+                throw new Error(m);
+            }
+            const ct = r.headers.get('content-type') || '';
+            return ct.includes('json') ? r.json() : null;
+        }
+
+   
+        // ROUTER
+      
+        async function goPage(k) {
+            curPage = k; setActive(k);
+            const el = $('main');
+            el.innerHTML = 'Загрузка...';
+            status('Загрузка: ' + k);
+            try {
+                if (k === 'products') await pageProducts(el);
+                else if (k === 'supplies') await pageSupplies(el);
+                else if (k === 'writeoffs') await pageWriteoffs(el);
+                else if (k === 'shop') await pageShop(el);
+                status('Готово.');
+            } catch (e) {
+                el.innerHTML = `<span class="err">Ошибка: ${e.message}</span>`;
+                status('Ошибка.');
+            }
+        }
+
+      
+        // PAGE: PRODUCTS (admin)
+   
+        async function pageProducts(el) {
+            const data = await api('GET', '/products');
+            data.sort((a, b) => {
+                const sa = a.sku || '', sb = b.sku || '';
+                const na = parseInt(sa), nb = parseInt(sb);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return sa.localeCompare(sb, 'ru');
+            });
+            let rows = data.map(p => {
+                const sc = p.stockQuantity <= 0 ? 'color:red' : p.stockQuantity <= 5 ? 'color:orange' : '';
+                return `<tr onclick="selRow(this)">
+          <td>${p.sku || ''}</td><td>${p.name}</td>
+          <td>${(p.price || 0).toLocaleString('ru')} ₽</td>
+          <td style="${sc}">${p.stockQuantity}</td>
+          <td><button class="btn" onclick="event.stopPropagation();openEdit(${p.id},'products')">Изм.</button></td>
+        </tr>`;
+            }).join('');
+            el.innerHTML = `
+        <div class="panel">
+          <table><thead><tr><th>Артикул</th><th>Название</th><th>Цена</th><th>Остаток</th><th>Действия</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="5">Нет товаров</td></tr>'}</tbody>
+        </table></div>`;
+        }
+
+      
+        // PAGE: SUPPLIES (admin)
+       
+        async function pageSupplies(el) {
+            supplyData = await api('GET', '/products');
+            supplyData.sort((a, b) => {
+                const sa = a.sku || '', sb = b.sku || '';
+                const na = parseInt(sa), nb = parseInt(sb);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return sa.localeCompare(sb, 'ru');
+            });
+            renderSupplies(el);
+        }
+
+        function renderSupplies(el) {
+            const q = supplyQ.toLowerCase();
+            const filtered = supplyData.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
+            const listRows = supplyList.map((it, i) => `
+        <tr style="${it.isNew ? 'background:#ffffcc' : ''}">
+          <td>${it.isNew ? '<i>новый</i>' : ''} ${it.name}</td>
+          <td>${it.sku || ''}</td>
+          <td><input type="number" min="1" value="${it.qty}" style="width:44px;border:1px inset #aaa"
+              onchange="supplyList[${i}].qty=parseInt(this.value)||1"></td>
+          <td>${it.price.toLocaleString('ru')} ₽</td>
+          <td><button class="btn" onclick="supplyList.splice(${i},1);renderSupplies($('main'))">✕</button></td>
+        </tr>`).join('');
+
+            const prodRows = filtered.map(p => `
+        <tr onclick="selRow(this)">
+          <td>${p.sku || ''}</td><td>${p.name}</td>
+          <td>${(p.price || 0).toLocaleString('ru')} ₽</td>
+          <td>${p.stockQuantity}</td>
+          <td><button class="btn" onclick="event.stopPropagation();addToSupply(${p.id})">+ Пополнить</button>
+              <button class="btn" onclick="event.stopPropagation();delItem(${p.id},'products')">Удал.</button></td>
+        </tr>`).join('');
+
+            el.innerHTML = `
+        <div class="supply-layout">
+          <div class="supply-left">
+            <div class="panel">
+              <h3>Товары на складе</h3>
+              <div class="searchbar">Поиск: <input value="${supplyQ}" oninput="supplyQ=this.value;renderSupplies($('main'))"></div>
+              <table><thead><tr><th>Арт.</th><th>Название</th><th>Цена</th><th>Остаток</th><th>Действия</th></tr></thead>
+              <tbody>${prodRows || '<tr><td colspan="5">Нет товаров</td></tr>'}</tbody></table>
+            </div>
+            <div class="panel" style="margin-top:10px">
+              <h3>Добавить новый товар в поставку</h3>
+              <table class="auth-table">
+                <tr><td>Название *</td><td><input id="new-name" style="width:160px;border:2px inset #fff"></td></tr>
+                <tr><td>Артикул</td><td><input id="new-sku" style="width:100px;border:2px inset #fff"></td></tr>
+                <tr><td>Единица</td><td><input id="new-unit" value="шт" style="width:60px;border:2px inset #fff"></td></tr>
+                <tr><td>Цена (₽)</td><td><input id="new-price" type="number" step="0.01" value="0" style="width:100px;border:2px inset #fff"></td></tr>
+                <tr><td>Количество</td><td><input id="new-qty" type="number" value="1" min="1" style="width:60px;border:2px inset #fff"></td></tr>
+                <tr><td></td><td><button class="btn" onclick="addNewToSupply()">+ Добавить в список</button></td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="supply-right">
+            <h3>Поставка</h3>
+            <div style="margin-bottom:8px">
+              <div class="form-row" style="margin-bottom:4px">
+                <label style="width:70px">Поставщик:</label>
+                <input style="width:155px;border:2px inset #fff" value="${supplyInfo.supplier}"
+                  oninput="supplyInfo.supplier=this.value">
+              </div>
+              <div class="form-row">
+                <label style="width:70px">Дата:</label>
+                <input type="date" style="width:155px;border:2px inset #fff" value="${supplyInfo.date || today()}"
+                  oninput="supplyInfo.date=this.value">
+              </div>
+            </div>
+            <hr style="margin:6px 0">
+            ${supplyList.length ? `
+              <table style="font-size:12px;width:100%">
+                <thead><tr><th>Товар</th><th>Арт.</th><th>Кол.</th><th>Цена</th><th></th></tr></thead>
+                <tbody>${listRows}</tbody>
+              </table>
+              <p style="font-size:12px;margin-top:6px">Позиций: <b>${supplyList.length}</b>
+                &nbsp;<span style="color:#808080">(жёлтые — новые)</span></p>
+              <button class="btn" onclick="doSupply()" style="width:100%;margin-top:4px">✓ Провести поставку</button>
+              <button class="btn" onclick="supplyList=[];renderSupplies($('main'))" style="width:100%;margin-top:2px">Очистить</button>
+            ` : '<p style="color:#808080;font-size:12px">Добавьте позиции слева</p>'}
+          </div>
+        </div>`;
+        }
+
+    
+        function addToSupply(productId) {
+            const p = supplyData.find(x => x.id === productId);
+            if (!p) return;
+            const ex = supplyList.find(x => x.id === productId && !x.isNew);
+            if (ex) { ex.qty++; }
+            else { supplyList.push({ id: p.id, name: p.name, sku: p.sku || '', price: p.price, qty: 1, isNew: false }); }
+            renderSupplies($('main'));
+        }
+
+  
+        function addNewToSupply() {
+            const name = $('new-name')?.value?.trim();
+            if (!name) { alert('Введите название товара'); return; }
+            const sku = $('new-sku')?.value?.trim() || '';
+            const unit = $('new-unit')?.value?.trim() || 'шт';
+            const price = parseFloat($('new-price')?.value) || 0;
+            const qty = parseInt($('new-qty')?.value) || 1;
+          
+            if (sku && supplyData.find(x => x.sku === sku)) {
+                if (!confirm(`Товар с артикулом "${sku}" уже есть на складе. Добавить как пополнение?`)) return;
+                const p = supplyData.find(x => x.sku === sku);
+                addToSupply(p.id); return;
+            }
+            supplyList.push({ id: null, name, sku, unit, price, qty, isNew: true });
+            renderSupplies($('main'));
+        }
+
+  
+        async function doSupply() {
+            if (!supplyList.length) { alert('Список поставки пуст'); return; }
+            if (!supplyInfo.supplier) { alert('Укажите поставщика'); return; }
+            status('Проведение поставки...');
+            try {
+                for (const it of supplyList) {
+                    if (it.isNew) {
+                        // Создать новый товар
+                        await api('POST', '/products', {
+                            name: it.name, sku: it.sku, unit: it.unit || 'шт',
+                            price: it.price, stockQuantity: it.qty
+                        });
+                    } else {
+                        // Пополнить существующий
+                        const p = supplyData.find(x => x.id === it.id);
+                        await api('PUT', `/products/${it.id}`, {
+                            id: p.id, name: p.name, sku: p.sku || '', unit: p.unit || 'шт',
+                            price: p.price, stockQuantity: p.stockQuantity + it.qty
+                        });
+                    }
+                }
+                const n = supplyList.length;
+                supplyList = []; supplyInfo = { supplier: '', date: '' };
+                alert(`Поставка проведена: ${n} позиций.`);
+                await pageSupplies($('main'));
+                status('Поставка проведена.');
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+                status('Ошибка.');
+            }
+        }
+
+      
+        // PAGE: WRITEOFFS (admin) 
+        async function pageWriteoffs(el) {
+            writeoffData = await api('GET', '/products');
+            writeoffData.sort((a, b) => {
+                const sa = a.sku || '', sb = b.sku || '';
+                const na = parseInt(sa), nb = parseInt(sb);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return sa.localeCompare(sb, 'ru');
+            });
+            renderWriteoffs(el);
+        }
+
+        function renderWriteoffs(el) {
+            const q = writeoffQ.toLowerCase();
+            const filtered = writeoffData.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
+
+            const listRows = writeoffList.map((it, i) => `
+        <tr>
+          <td>${it.name}</td>
+          <td><input type="number" min="1" max="${it.maxQty}" value="${it.qty}" style="width:50px;border:1px inset #aaa"
+              onchange="writeoffList[${i}].qty=Math.min(parseInt(this.value)||1,${it.maxQty});renderWriteoffs($('main'))"></td>
+          <td><button class="btn" onclick="writeoffList.splice(${i},1);renderWriteoffs($('main'))">Удал.</button></td>
+        </tr>`).join('');
+
+            const prodRows = filtered.map(p => {
+                const oos = p.stockQuantity <= 0;
+                return `<tr onclick="selRow(this)">
+          <td>${p.id}</td><td>${p.name}</td><td>${p.sku || ''}</td>
+          <td style="${oos ? 'color:red' : ''}">${p.stockQuantity}</td>
+          <td>${oos ? '—' : `<button class="btn" onclick="event.stopPropagation();addToWriteoff(${p.id})">+ Списать</button>`}</td>
+        </tr>`;
+            }).join('');
+
+            el.innerHTML = `
+        <div class="supply-layout">
+          <div class="supply-left">
+            <div class="panel">
+              <h3>Товары на складе</h3>
+              <div class="searchbar">Поиск: <input value="${writeoffQ}" oninput="writeoffQ=this.value;renderWriteoffs($('main'))"></div>
+              <table><thead><tr><th>ID</th><th>Название</th><th>Артикул</th><th>Остаток</th><th></th></tr></thead>
+              <tbody>${prodRows || '<tr><td colspan="5">Нет товаров</td></tr>'}</tbody></table>
+            </div>
+          </div>
+          <div class="supply-right">
+            <h3>Акт списания</h3>
+            <div style="margin-bottom:8px">
+              <div class="form-row" style="margin-bottom:4px">
+                <label style="width:60px;font-size:12px">Причина:</label>
+                <textarea style="width:170px;height:46px;border:2px inset #fff;font-size:12px"
+                  oninput="writeoffReason=this.value">${writeoffReason}</textarea>
+              </div>
+            </div>
+            <hr style="margin:6px 0">
+            ${writeoffList.length ? `
+              <table style="font-size:12px;width:100%">
+                <thead><tr><th>Товар</th><th>Кол-во</th><th></th></tr></thead>
+                <tbody>${listRows}</tbody>
+              </table>
+              <p style="font-size:12px;margin-top:6px">Позиций: <b>${writeoffList.length}</b></p>
+              <button class="btn" onclick="doWriteoff()" style="width:100%;margin-top:4px">✓ Провести списание</button>
+              <button class="btn" onclick="writeoffList=[];renderWriteoffs($('main'))" style="width:100%;margin-top:2px">Очистить</button>
+            ` : '<p style="color:#808080;font-size:12px">Добавьте позиции из списка слева</p>'}
+          </div>
+        </div>`;
+        }
+
+        function addToWriteoff(productId) {
+            const p = writeoffData.find(x => x.id === productId);
+            if (!p || p.stockQuantity <= 0) return;
+            const ex = writeoffList.find(x => x.id === productId);
+            if (ex) { ex.qty = Math.min(ex.qty + 1, p.stockQuantity); }
+            else { writeoffList.push({ id: p.id, name: p.name, qty: 1, maxQty: p.stockQuantity }); }
+            renderWriteoffs($('main'));
+        }
+
+      
+        async function doWriteoff() {
+            if (!writeoffList.length) { alert('Список списания пуст'); return; }
+            status('Проведение списания...');
+            try {
+                for (const it of writeoffList) {
+                    const p = writeoffData.find(x => x.id === it.id);
+                    if (it.qty > p.stockQuantity) { alert(`Недостаточно "${p.name}" на складе`); return; }
+                    await api('PUT', `/products/${it.id}`, {
+                        id: p.id, name: p.name, sku: p.sku || '', unit: p.unit || 'шт',
+                        price: p.price, stockQuantity: p.stockQuantity - it.qty
+                    });
+                }
+                const n = writeoffList.length;
+                writeoffList = []; writeoffReason = '';
+                alert(`Списание проведено: ${n} позиций.`);
+                await pageWriteoffs($('main'));
+                status('Списание проведено.');
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+                status('Ошибка.');
+            }
+        }
+
+   
+        // PAGE: SHOP (user)
+   
+        async function pageShop(el) {
+            shopData = await api('GET', '/products');
+            shopData.sort((a, b) => {
+                const sa = a.sku || '', sb = b.sku || '';
+                const na = parseInt(sa), nb = parseInt(sb);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return sa.localeCompare(sb, 'ru');
+            });
+            shopData.forEach(p => { if (!(p.id in quantities)) quantities[p.id] = 1; });
+            renderShop(el);
+        }
+
+        function renderShop(el) {
+            if (!el) el = $('main');
+            const q = shopQ.toLowerCase();
+            const filtered = shopData.filter(p => p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q));
+            const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+            const count = cart.reduce((s, c) => s + c.qty, 0);
+
+            const rows = filtered.map(p => {
+                const oos = p.stockQuantity <= 0;
+                const inCart = cart.some(c => c.id === p.id);
+                const qty = quantities[p.id] ?? 1;
+                const sc = oos ? 'color:red' : p.stockQuantity <= 5 ? 'color:darkorange' : '';
+                return `<tr onclick="selRow(this)">
+          <td>${p.name}</td>
+          <td>${p.sku || ''}</td>
+          <td>${(p.price || 0).toLocaleString('ru')} ₽</td>
+          <td style="${sc}">${oos ? 'Нет' : p.stockQuantity}</td>
+          <td>${oos ? '—' : `
+            <div class="qty-ctrl">
+              <button onclick="event.stopPropagation();chQty(${p.id},-1)">-</button>
+              <span id="qn${p.id}">${qty}</span>
+              <button onclick="event.stopPropagation();chQty(${p.id},1)">+</button>
+              <button class="btn" onclick="event.stopPropagation();addCart(${p.id})" 
+                style="min-width: 180px; padding: 6px 12px; font-size: 12.5px; ${inCart ? 'background:#22c55e;color:white;font-weight:bold;' : ''}">
+                ${inCart ? '✓ В корзине' : 'Добавить в корзину'}
+              </button>
+            </div>`}
+          </td>
+        </tr>`;
+            }).join('');
+
+            const cartRows = cart.map(c => `
+        <div class="cart-item">
+          <span style="flex:1">${c.name}<br><small>${c.qty} × ${c.price.toLocaleString('ru')} ₽</small></span>
+          <span style="white-space:nowrap">${(c.price * c.qty).toLocaleString('ru')} ₽</span>
+          <button class="btn" onclick="rmCart(${c.id})" style="margin-left:4px">✕</button>
+        </div>`).join('');
+
+            el.innerHTML = `
+        <div class="shop-layout">
+          <div class="shop-left">
+            <div class="panel">
+              <h3>Каталог товаров</h3>
+              <div class="searchbar">Поиск: <input value="${shopQ}" oninput="shopQ=this.value;renderShop()"></div>
+              <table>
+                <thead><tr><th>Название</th><th>Артикул</th><th>Цена</th><th>Остаток</th><th>Добавить</th></tr></thead>
+                <tbody>${rows || '<tr><td colspan="5">Нет товаров</td></tr>'}</tbody>
+              </table>
+            </div>
+          </div>
+          <div class="cart-box">
+            <h3>Корзина (${count} шт.)</h3>
+            ${cart.length ? cartRows : '<p style="color:#808080;font-size:12px">Пусто</p>'}
+            ${cart.length ? `
+              <div class="cart-total">Итого: ${total.toLocaleString('ru')} ₽</div>
+              <div class="btn-row" style="margin-top:6px">
+                <button class="btn" onclick="doBuy()" style="width:100%">✓ Купить</button>
+                <button class="btn" onclick="cart=[];renderShop()" style="width:100%;margin-top:2px">Очистить</button>
+              </div>` : ''}
+          </div>
+        </div>`;
+        }
+
+        function chQty(productId, delta) {
+            const p = shopData.find(x => x.id === productId);
+            if (!p) return;
+            quantities[productId] = Math.min(p.stockQuantity, Math.max(1, (quantities[productId] ?? 1) + delta));
+            const el = $('qn' + productId); if (el) el.textContent = quantities[productId];
+            const ci = cart.find(c => c.id === productId);
+            if (ci) { ci.qty = quantities[productId]; renderShop(); }
+        }
+
+        function addCart(productId) {
+            const p = shopData.find(x => x.id === productId);
+            if (!p || p.stockQuantity <= 0) return;
+            const qty = quantities[productId] ?? 1;
+            const ex = cart.find(c => c.id === productId);
+            if (ex) ex.qty = qty; else cart.push({ id: p.id, name: p.name, price: p.price, qty });
+            renderShop();
+        }
+
+        function rmCart(productId) { cart = cart.filter(c => c.id !== productId); renderShop(); }
+
+        async function doBuy() {
+            if (!cart.length) return;
+            for (const ci of cart) {
+                const p = shopData.find(x => x.id === ci.id);
+                if (!p || ci.qty > p.stockQuantity) { alert(`Недостаточно "${ci.name}" на складе`); return; }
+            }
+            const bought = [...cart]; cart = [];
+            try {
+                for (const ci of bought) {
+                    const p = shopData.find(x => x.id === ci.id);
+                    await api('PUT', `/products/${ci.id}`, {
+                        id: p.id, name: p.name, sku: p.sku || '', unit: p.unit || 'шт',
+                        price: p.price, stockQuantity: p.stockQuantity - ci.qty
+                    });
+                }
+                alert('Покупка оформлена!\n' + bought.map(c => `${c.name} × ${c.qty}`).join('\n'));
+                quantities = {};
+                await pageShop($('main'));
+            } catch (e) {
+                cart = bought;
+                alert('Ошибка: ' + e.message);
+                await pageShop($('main'));
+            }
+        }
+
+      
+        // ADMIN MODAL (добавить/редактировать товар)
+       
+        async function openAdd(entity) {
+            editId = null;
+            $('dlg-title').textContent = 'Добавить товар';
+            $('dlg-body').innerHTML = productForm();
+            $('overlay').classList.add('show');
+        }
+
+        async function openEdit(id, entity) {
+            editId = id;
+            $('dlg-title').textContent = 'Редактировать товар';
+            $('dlg-body').innerHTML = 'Загрузка...';
+            $('overlay').classList.add('show');
+            try {
+                const it = await api('GET', `/${entity}/${id}`);
+                $('dlg-body').innerHTML = productForm();
+                sv('fn', it.name); sv('fsku', it.sku || ''); sv('funit', it.unit || 'шт');
+                sv('fprice', it.price || 0); sv('fstock', it.stockQuantity || 0);
+            } catch (e) { $('dlg-body').innerHTML = `<span class="err">${e.message}</span>`; }
+        }
+
+        function productForm() {
+            return `
+        <table class="auth-table">
+          <tr><td>Название *</td><td><input id="fn" style="width:200px;border:2px inset #fff"></td></tr>
+          <tr><td>Артикул</td><td><input id="fsku" style="width:200px;border:2px inset #fff"></td></tr>
+          <tr><td>Единица</td><td><input id="funit" value="шт" style="width:80px;border:2px inset #fff"></td></tr>
+          <tr><td>Цена (₽)</td><td><input id="fprice" type="number" step="0.01" style="width:120px;border:2px inset #fff"></td></tr>
+          <tr><td>Остаток</td><td><input id="fstock" type="number" value="0" style="width:80px;border:2px inset #fff"></td></tr>
+        </table>`;
+        }
+
+        async function saveModal() {
+            const name = $('fn')?.value?.trim();
+            if (!name) { alert('Введите название'); return; }
+            const data = {
+                name, sku: sv2('fsku'), unit: $('funit')?.value || 'шт',
+                price: parseFloat($('fprice')?.value) || 0,
+                stockQuantity: parseInt($('fstock')?.value) || 0
+            };
+            try {
+                if (editId) { await api('PUT', `/products/${editId}`, { ...data, id: editId }); }
+                else { await api('POST', '/products', data); }
+                closeModal(); goPage('products');
+            } catch (e) { alert('Ошибка: ' + e.message); }
+        }
+
+        async function delItem(id, entity) {
+            if (!confirm('Удалить запись?')) return;
+            try {
+                await api('DELETE', `/${entity}/${id}`);
+                goPage(curPage);
+            } catch (e) { alert('Ошибка: ' + e.message); }
+        }
+
+        function closeModal() { $('overlay').classList.remove('show'); }
+
+  
+        // UTILS
+       
+        const $ = id => document.getElementById(id);
+        const sv = (id, val) => { const e = $(id); if (e) e.value = val ?? ''; };
+        const sv2 = id => $('f' + id.replace('f', ''))?.value || '';
+        const today = () => new Date().toISOString().split('T')[0];
+
+        function selRow(tr) {
+            tr.closest('tbody').querySelectorAll('tr').forEach(r => r.classList.remove('sel'));
+            tr.classList.add('sel');
+        }
+    </script>
+</body>
+</html>
