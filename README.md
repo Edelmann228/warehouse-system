@@ -290,6 +290,4 @@ curl http://localhost/api/products
 # Метрики доступны
 curl http://localhost/metrics
 
-# БД содержит данные
-docker exec -it warehouse-db-1 psql -U postgres -d warehouse -c "SELECT * FROM \"Products\";"
 ```
